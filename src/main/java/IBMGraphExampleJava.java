@@ -35,6 +35,7 @@ public class IBMGraphExampleJava {
 
 	if (apiURL == null || username == null || password == null) {
 	    System.out.println("Please provision your own Graph service and update your credentials in the code.");
+	    System.exit(1);
 	}
 
 	// The baseURI is the same as apiURL minus the /g suffix
@@ -308,22 +309,32 @@ public class IBMGraphExampleJava {
 	    JSONObject response = data.getJSONObject(0);
 	    System.out.println("response from basic gremlin query" + response);
 	}
+	
+	System.out.println("\n\n*****************************\n");
 
 	// Delete an edge
+	System.out.println("deleting an edge");
 	HttpDelete httpDelete = new HttpDelete(apiURL + "/edges/" + e1);
 	httpDelete.setHeader("Authorization", gdsTokenAuth);
 	httpResponse = client.execute(httpDelete);
 	httpEntity = httpResponse.getEntity();
 	content = EntityUtils.toString(httpEntity);
 	EntityUtils.consume(httpEntity);
+	jsonContent = new JSONObject(content);
+	System.out.println("response from deleting an edge" + jsonContent);
+	
+	System.out.println("\n\n*****************************\n");
 
 	// Delete a vertex
+	System.out.println("deleting a vertex");
 	httpDelete = new HttpDelete(apiURL + "/vertices/" + v1);
 	httpDelete.setHeader("Authorization", gdsTokenAuth);
 	httpResponse = client.execute(httpDelete);
 	httpEntity = httpResponse.getEntity();
 	content = EntityUtils.toString(httpEntity);
 	EntityUtils.consume(httpEntity);
+	jsonContent = new JSONObject(content);
+	System.out.println("response from deleting a vertex" + jsonContent);
     }
 
     private static String getGDSToken(String sessionURI, String basicAuth, HttpClient client)
