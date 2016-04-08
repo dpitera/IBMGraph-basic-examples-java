@@ -1,0 +1,41 @@
+{
+  "propertyKeys": [
+    {"name": "name", "dataType": "String", "cardinality": "SINGLE"},
+    {"name": "address", "dataType": "String", "cardinality": "SINGLE"},
+    {"name": "phone", "dataType": "String", "cardinality": "SINGLE"}
+  ],
+  "vertexLabels": [
+    {"name": "person"}
+  ],
+  "edgeLabels": [
+    {"name": "knows", "multiplicity": "MULTI"}
+  ],
+  "vertexIndexes": [
+    {"name": "vByName",
+      "propertyKeys": ["name"],
+      "composite": true,
+      "unique": false},
+    {"name": "vByAddress",
+      "propertyKeys": ["address"],
+      "composite": true,
+      "unique": false},
+    {"name": "vByPhone",
+      "propertyKeys": ["phone"],
+      "composite": true,
+      "unique": false}
+  ],
+  "edgeIndexes": [
+    {"name": "eByName",
+      "propertyKeys": ["name"],
+      "composite": true,
+      "unique": false},
+    {"name": "eByAddress",
+      "propertyKeys": ["address"],
+      "composite": true,
+      "unique": false},
+    {"name": "eByPhone",
+      "propertyKeys": ["phone"],
+      "composite": true,
+      "unique": false}
+  ]
+}
