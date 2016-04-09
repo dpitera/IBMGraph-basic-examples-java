@@ -43,13 +43,12 @@ public class IBMGraphExampleJava {
 	sessionURI = baseURI + "/_session";
 
 	// Form the basic authorization string
-	System.out.println("Begin basic authorization string");
+	System.out.println("Setting up basic authorization");
 	// Create the basic authorization string
 	byte[] userpass = (username + ":" + password).getBytes();
 	byte[] encoding = Base64.getEncoder().encode(userpass);
 	basicAuth = "Basic " + new String(encoding);
 	System.out.println("basicAuth is " + basicAuth);
-	System.out.println("End basic authorization");
 
 	System.out.println("\n\n*****************************\n");
 
@@ -102,13 +101,17 @@ public class IBMGraphExampleJava {
 	System.out.println("\n\n*****************************\n");
 
 	// Create a vertex, v1
+	//Note: we will not provide a label, and it will default to "vertex"
 	System.out.println("creating vertex");
 	String v1 = null;
 	String postURL = apiURL + "/vertices";
 	postData = new JSONObject();
-	postData.put("name", "david");
-	postData.put("address", "Boston");
-	postData.put("phone", "888-888-8888");
+	//we must nest our vertex/edge indexes inside a properties {} object
+	JSONObject vertexIndices = new JSONObject();
+	vertexIndices.put("name", "david");
+	vertexIndices.put("address", "Boston");
+	vertexIndices.put("phone", "888-888-8888");
+	postData.put("properties", vertexIndices);
 	httpPost = new HttpPost(postURL);
 	strEnt = new StringEntity(postData.toString(), ContentType.APPLICATION_JSON);
 	httpPost.setEntity(strEnt);
@@ -168,7 +171,9 @@ public class IBMGraphExampleJava {
 	System.out.println("updating a vertex");
 	postURL = apiURL + "/vertices/" + v1;
 	postData = new JSONObject();
-	postData.put("phone", "999-999-9999");
+	vertexIndices = new JSONObject();
+	vertexIndices.put("phone", "999-999-9999");
+	postData.put("properties", vertexIndices);
 	httpPost = new HttpPost(postURL);
 	httpPost.setHeader("Authorization", gdsTokenAuth);
 	strEnt = new StringEntity(postData.toString(), ContentType.APPLICATION_JSON);
@@ -207,14 +212,17 @@ public class IBMGraphExampleJava {
 
 	// Now let's do some edge operations. To create an edge, we need to
 	// create an additional vertex.
-	// Create vertex, v2
+	// Create vertex, v2, with custom label
 	System.out.println("creating vertex, v2");
 	String v2 = null;
 	postURL = apiURL + "/vertices";
 	postData = new JSONObject();
-	postData.put("name", "ricardo");
-	postData.put("address", "california");
-	postData.put("phone", "111-111-1111");
+	vertexIndices = new JSONObject();
+	vertexIndices.put("name", "ricardo");
+	vertexIndices.put("address", "california");
+	vertexIndices.put("phone", "111-111-1111");
+	postData.put("properties", vertexIndices);
+	postData.put("label",  "person");
 	httpPost = new HttpPost(postURL);
 	strEnt = new StringEntity(postData.toString(), ContentType.APPLICATION_JSON);
 	httpPost.setEntity(strEnt);
@@ -241,6 +249,8 @@ public class IBMGraphExampleJava {
 	String vertexId1 = v1;
 	String vertexId2 = v2;
 	postData = new JSONObject();
+	//these edge properties are required, and do not go inside a properties {} object
+	//since they are not edge indexes
 	postData.put("outV", vertexId1);
 	postData.put("inV", vertexId2);
 	postData.put("label", "knows");
@@ -290,6 +300,10 @@ public class IBMGraphExampleJava {
 	// Note: Vertex and edge labels are immutable. Edge labels are required.
 
 	// Basic gremlin query
+	//Note: You must begin all gremlin queries with "def"
+	//Note: You can use IBM Graph's `/gremlin` endpoint to create vertices and edges,
+	//but I recommend, especially for beginners to TinkerPOP v3, to use it mostly for
+	//complex querying.
 	System.out.println("running a basic gremlin query");
 	postURL = apiURL + "/gremlin";
 	postData = new JSONObject();
@@ -341,7 +355,7 @@ public class IBMGraphExampleJava {
 	    throws ClientProtocolException, IOException, JSONException {
 	String gdsToken;
 	String gdsTokenAuth = null;
-	System.out.println("Start getting session Authorization Token");
+	System.out.println("Getting session Authorization Token");
 	HttpGet httpGet = new HttpGet(sessionURI);
 	httpGet.setHeader("Authorization", basicAuth);
 	HttpResponse httpResponse = client.execute(httpGet);
@@ -354,7 +368,6 @@ public class IBMGraphExampleJava {
 	System.out.println("The gdsToken value is " + gdsToken);
 	gdsTokenAuth = "gds-token " + gdsToken;
 	System.out.println("gdsTokenAuth is " + gdsTokenAuth);
-	System.out.println("End getting session Authorization Token");
 	System.out.println("\n\n*****************************\n");
 	return gdsTokenAuth;
     }
